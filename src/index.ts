@@ -78,7 +78,7 @@ app.post("/webhook", async (req, res) => {
   );
 
   try {
-    await submitForm({
+    const formResult = await submitForm({
       email: donation.email,
       firstname: donation.first_name,
       lastname: donation.last_name,
@@ -88,6 +88,7 @@ app.post("/webhook", async (req, res) => {
       amount: parseFloat(donation.total_amount),
       actionId: donation.action_id,
     });
+    console.log(formResult);
   } catch (error) {
     console.log(
       `[HUBSPOT] Failed submitting form in Hubspot with email "${donation.email}"`
