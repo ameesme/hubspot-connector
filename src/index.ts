@@ -117,6 +117,7 @@ if (process.env.NODE_ENV === "production") {
       app
     )
     .listen(443);
+  console.log(`[SERVER] Server is running on port 443`);
 } else {
   app.listen(3000, () => {
     console.log(`[SERVER] Server is running on port 3000`);
