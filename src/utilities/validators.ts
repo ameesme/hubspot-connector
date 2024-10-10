@@ -33,8 +33,8 @@ export function isDonationComplete(data: Donation): boolean {
     !data ||
     !data.email ||
     !data.total_amount ||
-    !data.newsletter ||
-    !data.payment_status
+    !data.payment_status ||
+    typeof data.newsletter !== "boolean"
   ) {
     return false;
   }
