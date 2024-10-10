@@ -33,7 +33,7 @@ export function submitForm(formData: FormData): Promise<any> {
       {
         objectTypeId: "0-1",
         name: "kentaa_action_id",
-        value: formData.actionId,
+        value: formData.actionId || 0,
       },
     ],
     context: {
