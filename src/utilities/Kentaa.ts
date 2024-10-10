@@ -1,6 +1,7 @@
 export interface Donation {
   id: number;
   site_id: number;
+  action_id?: number;
   created_at: string;
   updated_at: string;
   first_name: string;
@@ -53,7 +54,6 @@ export function getDonation(apiKey: string, id: number): Promise<Donation> {
     .then((res) => res.json())
     .then((data: unknown): Donation => {
       if (typeof data === "object" && data !== null && "donation" in data) {
-        console.log(data.donation);
         return data.donation as Donation;
       }
       throw new Error("Invalid response format");

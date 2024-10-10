@@ -1,25 +1,22 @@
-import { Client } from "@hubspot/api-client";
 import bodyParser from "body-parser";
 import express from "express";
 import dotenv from "dotenv";
+import fs from "fs";
+import https from "https";
 import {
   isDonationComplete,
   isWebhookValid,
   WebhookData,
 } from "./utilities/validators";
 import { Donation, getDonation } from "./utilities/Kentaa";
-import {
-  BatchResponseSimplePublicUpsertObject,
-  BatchResponseSimplePublicUpsertObjectWithErrors,
-} from "@hubspot/api-client/lib/codegen/crm/contacts";
+import { submitForm } from "./utilities/Hubspot";
 
 dotenv.config();
-if (!process.env.HUBSPOT_API_KEY || !process.env.KENTAA_API_KEY) {
+if (!process.env.KENTAA_API_KEY) {
   throw new Error("API keys are missing");
 }
 
 const app = express();
-const hubspotClient = new Client({ accessToken: process.env.HUBSPOT_API_KEY });
 
 app.use(bodyParser.json());
 
@@ -75,58 +72,53 @@ app.post("/webhook", async (req, res) => {
     return;
   }
 
-  // Create or update contact in HubSpot
+  // Submit form in HubSpot
   console.log(
-    `[HUBSPOT] Upserting contact in Hubspot with email "${donation.email}"`
+    `[HUBSPOT] Submitting form in Hubspot with email "${donation.email}"`
   );
 
-  const properties = {
-    firstname: donation.first_name,
-    lastname: donation.last_name,
-    newsletter_signup: donation.newsletter.toString(),
-    hs_language: donation.locale,
-    lifecyclestage: "subscriber",
-  };
-
-  console.log({ properties });
-
-  let contactDetails:
-    | BatchResponseSimplePublicUpsertObjectWithErrors
-    | BatchResponseSimplePublicUpsertObject
-    | null = null;
   try {
-    contactDetails = await hubspotClient.crm.contacts.batchApi.upsert({
-      inputs: [
-        {
-          id: donation.email,
-          idProperty: "email",
-          properties,
-        },
-      ],
+    await submitForm({
+      email: donation.email,
+      firstname: donation.first_name,
+      lastname: donation.last_name,
+      hs_language: donation.locale,
+      subscribeOneOnOne: donation.newsletter,
+      subscribeNews: donation.newsletter,
+      amount: parseFloat(donation.total_amount),
+      actionId: donation.action_id,
     });
-    hubspotClient.marketing.forms.formsApi.create;
   } catch (error) {
     console.log(
-      `[HUBSPOT] Failed upserting contact in Hubspot with email "${donation.email}"`
+      `[HUBSPOT] Failed submitting form in Hubspot with email "${donation.email}"`
     );
     console.error(error);
-    res.status(500).send("Failed to create/update contact");
+    res.status(500).send("Failed to submit form");
     return;
   }
-
-  if (!contactDetails || contactDetails.status !== "COMPLETE") {
-    console.log(
-      `[HUBSPOT] Hubspot contact with email "${donation.email}" was not completed`
-    );
-    res.status(500).send("Failed to create/update contact");
-    return;
-  }
-
-  console.log(contactDetails);
 
   res.status(200).send();
 });
 
-app.listen(4000, () => {
-  console.log(`server running on port 4000`);
-});
+if (process.env.NODE_ENV === "production") {
+  if (!process.env.SSL_PRIVATE_KEY_PATH || !process.env.SSL_CERTIFICATE_PATH) {
+    throw new Error("SSL paths are missing");
+  }
+
+  const privateKey = fs.readFileSync(process.env.SSL_PRIVATE_KEY_PATH);
+  const certificate = fs.readFileSync(process.env.SSL_CERTIFICATE_PATH);
+
+  https
+    .createServer(
+      {
+        key: privateKey,
+        cert: certificate,
+      },
+      app
+    )
+    .listen(443);
+} else {
+  app.listen(3000, () => {
+    console.log(`[SERVER] Server is running on port 3000`);
+  });
+}

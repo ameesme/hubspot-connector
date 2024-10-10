@@ -1,4 +1,4 @@
-export function submitKentaaForm(formData: FormData): Promise<any> {
+export function submitForm(formData: FormData): Promise<any> {
   const url =
     "https://api.hsforms.com/submissions/v3/integration/submit/5575635/a2867ab8-08be-4daf-9380-2b2bc31cbd39";
 
@@ -22,8 +22,18 @@ export function submitKentaaForm(formData: FormData): Promise<any> {
       },
       {
         objectTypeId: "0-1",
+        name: "kentaa_donation_amount",
+        value: formData.amount,
+      },
+      {
+        objectTypeId: "0-1",
         name: "hs_language",
         value: formData.hs_language,
+      },
+      {
+        objectTypeId: "0-1",
+        name: "kentaa_action_id",
+        value: formData.actionId,
       },
     ],
     context: {
@@ -70,7 +80,6 @@ export function submitKentaaForm(formData: FormData): Promise<any> {
     })
     .then((data: unknown): any => {
       if (typeof data === "object" && data !== null) {
-        console.log(data);
         return data;
       }
       throw new Error("Invalid response format");
@@ -85,4 +94,6 @@ interface FormData {
   hs_language: string;
   subscribeOneOnOne: boolean;
   subscribeNews: boolean;
+  amount: number;
+  actionId?: number;
 }
