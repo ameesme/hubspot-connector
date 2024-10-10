@@ -76,6 +76,8 @@ export function submitForm(formData: FormData): Promise<any> {
   })
     .then((response) => {
       if (!response.ok) {
+        const responseData = response.json();
+        console.log(responseData);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       return response.json();
