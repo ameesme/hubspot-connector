@@ -1,0 +1,26 @@
+{
+  "name": "Kentaa-Hubspot-Connector",
+  "version": "1.0.0",
+  "description": " Service that automatically pushes Kentaa donations to a Hubspot-contact and deal ",
+  "main": "index.ts",
+  "repository": "git@github.com:ameesme/kentaa-hubspot-connector.git",
+  "author": "Mees Boeijen <mees@amees.me>",
+  "license": "COMMERCIAL",
+  "private": true,
+  "scripts": {
+    "start": "ts-node src/index.ts"
+  },
+  "devDependencies": {
+    "@types/body-parser": "^1.19.5",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.7.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.3"
+  },
+  "dependencies": {
+    "@hubspot/api-client": "^12.0.1",
+    "body-parser": "^1.20.3",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1"
+  }
+}
