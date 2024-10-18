@@ -87,6 +87,7 @@ app.post("/webhook", async (req, res) => {
       subscribeNews: donation.newsletter,
       amount: parseFloat(donation.total_amount),
       actionId: donation.action_id,
+      company: donation.company,
     });
     console.log(formResult);
   } catch (error) {

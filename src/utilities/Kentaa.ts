@@ -6,6 +6,7 @@ export interface Donation {
   updated_at: string;
   first_name: string;
   last_name: string;
+  company: string;
   anonymous: boolean;
   contact_details_type: string;
   email: string;

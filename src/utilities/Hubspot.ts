@@ -27,6 +27,11 @@ export function submitForm(formData: FormData): Promise<any> {
       },
       {
         objectTypeId: "0-1",
+        name: "kentaa_company_name",
+        value: formData.company,
+      },
+      {
+        objectTypeId: "0-1",
         name: "hs_language",
         value: formData.hs_language,
       },
@@ -100,4 +105,5 @@ interface FormData {
   subscribeNews: boolean;
   amount: number;
   actionId?: number;
+  company?: string;
 }
