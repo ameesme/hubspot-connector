@@ -70,14 +70,19 @@ export function submitForm(formData: FormData): Promise<any> {
     },
   };
 
-  console.log(JSON.stringify(data, null, 2));
+  const filteredData = {
+    ...data,
+    fields: data.fields.filter((field) => field.value !== undefined),
+  }
+
+  console.log(JSON.stringify(filteredData, null, 2));
 
   return fetch(url, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(data),
+    body: JSON.stringify(filteredData),
   })
     .then((response) => {
       if (!response.ok) {
