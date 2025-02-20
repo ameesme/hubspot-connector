@@ -9,7 +9,7 @@ import {
   WebhookData,
 } from "./utilities/validators";
 import { Donation, getDonation } from "./utilities/Kentaa";
-import { submitForm } from "./utilities/Hubspot";
+import { submitKentaaForm } from "./utilities/Hubspot";
 
 dotenv.config();
 if (!process.env.KENTAA_API_KEY) {
@@ -78,7 +78,7 @@ app.post("/webhook", async (req, res) => {
   );
 
   try {
-    const formResult = await submitForm({
+    const formResult = await submitKentaaForm({
       email: donation.email,
       firstname: donation.first_name,
       lastname: donation.last_name,

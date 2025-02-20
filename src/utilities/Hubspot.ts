@@ -1,4 +1,14 @@
-export function submitForm(formData: FormData): Promise<any> {
+export function submitKentaaForm(formData: {
+  email: string;
+  firstname: string;
+  lastname: string;
+  hs_language: string;
+  subscribeOneOnOne: boolean;
+  subscribeNews: boolean;
+  amount: number;
+  actionId?: number;
+  company?: string;
+}): Promise<any> {
   const url =
     "https://api.hsforms.com/submissions/v3/integration/submit/5575635/a2867ab8-08be-4daf-9380-2b2bc31cbd39";
 
@@ -73,7 +83,7 @@ export function submitForm(formData: FormData): Promise<any> {
   const filteredData = {
     ...data,
     fields: data.fields.filter((field) => field.value !== undefined),
-  }
+  };
 
   console.log(JSON.stringify(filteredData, null, 2));
 
@@ -98,17 +108,4 @@ export function submitForm(formData: FormData): Promise<any> {
       }
       throw new Error("Invalid response format");
     });
-}
-
-// Define an interface for the form data
-interface FormData {
-  email: string;
-  firstname: string;
-  lastname: string;
-  hs_language: string;
-  subscribeOneOnOne: boolean;
-  subscribeNews: boolean;
-  amount: number;
-  actionId?: number;
-  company?: string;
 }
