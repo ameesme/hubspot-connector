@@ -1,1 +1,1 @@
-# kentaa-hubspot-connector
+# hubspot-connector

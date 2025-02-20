@@ -1,9 +1,9 @@
 {
-  "name": "kentaa-hubspot-connector",
+  "name": "hubspot-connector",
   "version": "1.0.0",
-  "description": "Service that automatically pushes Kentaa donations to a Hubspot-contact and deal ",
+  "description": "Service that automatically pushes Kentaa and Stripe donations to a Hubspot-contact and deal",
   "main": "index.ts",
-  "repository": "git@github.com:ameesme/kentaa-hubspot-connector.git",
+  "repository": "git@github.com:ameesme/hubspot-connector.git",
   "author": "Mees Boeijen <mees@amees.me>",
   "license": "COMMERCIAL",
   "private": true,
