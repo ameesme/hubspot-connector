@@ -46,6 +46,38 @@ export interface Address {
   country: string;
 }
 
+
+export interface KentaaWebhookData {
+  object_type: string;
+  object_id: number;
+  event_type: string;
+  application: string;
+  site_id: number;
+}
+
+export function isKentaaWebhookValid(data: KentaaWebhookData): boolean {
+  if (!data || !data.event_type || !data.object_id) {
+    return false;
+  }
+
+  return data.event_type === "donations.update";
+}
+
+export function isKentaaDonationComplete(data: Donation): boolean {
+  if (
+    !data ||
+    !data.email ||
+    !data.total_amount ||
+    !data.payment_status ||
+    typeof data.newsletter !== "boolean"
+  ) {
+    return false;
+  }
+
+  return true;
+}
+
+
 export function getDonation(apiKey: string, id: number): Promise<Donation> {
   return fetch(`https://api.kentaa.nl/v1/donations/${id}`, {
     headers: {
