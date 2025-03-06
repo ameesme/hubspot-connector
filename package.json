@@ -10,9 +10,10 @@
   "scripts": {
     "start": "ts-node src/index.ts",
     "clean": "rm -rf build",
-    "build": "tsc",
+    "build": "yarn clean && tsc && yarn copy-static",
     "prod:pm2": "NODE_ENV=production pm2 start build/index.js --watch -i max",
-    "prod": "NODE_ENV=production node build/index.js"
+    "prod": "NODE_ENV=production node build/index.js",
+    "copy-static": "cp -r src/public build"
   },
   "devDependencies": {
     "@types/body-parser": "^1.19.5",
