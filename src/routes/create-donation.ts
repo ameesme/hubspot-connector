@@ -27,7 +27,6 @@ interface FormData {
   companyName?: string;
   companyURL?: string;
   address?: string;
-  postalCode?: string;
   city?: string;
   country?: string;
 
@@ -100,7 +99,6 @@ async function handleCreateDonation(
     name,
     address: {
       line1: body.address,
-      postal_code: body.postalCode,
       city: body.city,
       country: body.country,
     },
@@ -137,13 +135,11 @@ async function handleCreateDonation(
 
   // Create Stripe recurring payment intent
   const metadata = {
-    campaignId: campaignId || null,
     email,
   };
   const paymentIntent = await stripe.checkout.sessions.create({
     mode: frequency === "oneTime" ? "payment" : "subscription",
     customer: stripeCustomer.id,
-    
     line_items: [
       {
         price_data: {

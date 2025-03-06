@@ -58,17 +58,20 @@ export function submitKentaaDonationForm(formData: {
     legalConsentOptions: {
       consent: {
         consentToProcess: true,
-        text: "I agree to allow Sheltersuit to store and process my personal data.",
+        text:
+          "I agree to allow Sheltersuit to store and process my personal data.",
         communications: [
           {
             value: true,
             subscriptionTypeId: 105326153,
-            text: "I agree to receive donation confirmations and other essential information (* required)",
+            text:
+              "I agree to receive donation confirmations and other essential information (* required)",
           },
           {
             value: formData.subscribeOneOnOne || false,
             subscriptionTypeId: 6120458,
-            text: "Employees can contact me via one to one communication (* required)",
+            text:
+              "Employees can contact me via one to one communication (* required)",
           },
           {
             value: formData.subscribeNews || false,
@@ -120,7 +123,8 @@ export async function submitStripeDonationForm(formData: {
   campaign_name?: string;
   newsletter: boolean;
 }): Promise<any> {
-  const url = "https://api.hsforms.com/submissions/v3/integration/submit/5575635/8a61e0bc-07e0-4430-afc7-a00e4f45c96d";
+  const url =
+    "https://api.hsforms.com/submissions/v3/integration/submit/5575635/8a61e0bc-07e0-4430-afc7-a00e4f45c96d";
 
   const data = {
     fields: [
@@ -131,7 +135,7 @@ export async function submitStripeDonationForm(formData: {
       },
       {
         objectTypeId: "0-1",
-        name: "firstname", 
+        name: "firstname",
         value: formData.firstName,
       },
       {
@@ -165,9 +169,10 @@ export async function submitStripeDonationForm(formData: {
         value: formData.country,
       },
       {
+        objectTypeId: "0-1",
         name: "campaign_name",
         value: formData.campaign_name,
-      }
+      },
     ],
     context: {
       pageUri: "https://sheltersuit.com/donate",
@@ -175,14 +180,18 @@ export async function submitStripeDonationForm(formData: {
     },
     legalConsentOptions: {
       consent: {
+        consentToProcess: true,
+        text:
+          "I agree to allow Sheltersuit to store and process my personal data.",
         communications: [
           {
             value: true,
             subscriptionTypeId: 105326153,
-            text: "I agree to receive donation confirmations and other essential information (* required)",
+            text:
+              "I agree to receive donation confirmations and other essential information (* required)",
           },
           {
-            value: formData.newsletter || false,
+            value: !!formData.newsletter || false,
             subscriptionTypeId: 6120420,
             text: "I want to receive updates via the newsletter",
           },
@@ -193,7 +202,9 @@ export async function submitStripeDonationForm(formData: {
 
   const filteredData = {
     ...data,
-    fields: data.fields.filter((field) => field.value !== undefined),
+    fields: data.fields.filter((field) =>
+      field.value !== undefined && field.value !== null
+    ),
   };
 
   return fetch(url, {
@@ -203,9 +214,9 @@ export async function submitStripeDonationForm(formData: {
     },
     body: JSON.stringify(filteredData),
   })
-    .then((response) => {
+    .then(async (response) => {
       if (!response.ok) {
-        const responseData = response.json();
+        const responseData = await response.json();
         console.log(responseData);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -225,7 +236,8 @@ export async function submitStripePaymentReceipt(formData: {
   currency: string;
   recurring: boolean;
 }): Promise<any> {
-  const url = "https://api.hsforms.com/submissions/v3/integration/submit/5575635/a638f105-8287-4d70-8830-4c0893bd5a3a";
+  const url =
+    "https://api.hsforms.com/submissions/v3/integration/submit/5575635/a638f105-8287-4d70-8830-4c0893bd5a3a";
 
   const amount = (formData.amountInCents / 100).toFixed(2);
 
@@ -237,24 +249,31 @@ export async function submitStripePaymentReceipt(formData: {
         value: formData.email,
       },
       {
-          objectTypeId: "0-1",
-          name: "stripe_donation_amount",
-          value: amount,
+        objectTypeId: "0-1",
+        name: "stripe_donation_amount",
+        value: amount,
       },
       {
-          objectTypeId: "0-1",
-          name: "stripe_donation_currency",
-          value: formData.currency,
+        objectTypeId: "0-1",
+        name: "stripe_donation_currency",
+        value: formData.currency,
       },
       {
-          objectTypeId: "0-1",
-          name: "stripe_donation_recurring",
-          value: formData.recurring,
+        objectTypeId: "0-1",
+        name: "stripe_donation_recurring",
+        value: formData.recurring,
       },
     ],
     context: {
       pageUri: "https://sheltersuit.com/donate",
       pageName: "Donation Form",
+    },
+    legalConsentOptions: {
+      consent: {
+        consentToProcess: true,
+        text:
+          "I agree to allow Sheltersuit to store and process my personal data.",
+      },
     },
   };
 
