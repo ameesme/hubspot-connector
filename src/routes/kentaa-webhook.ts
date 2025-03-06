@@ -1,5 +1,5 @@
 import express from "express";
-import { submitKentaaForm } from "../utilities/Hubspot";
+import { submitKentaaDonationForm } from "../utilities/Hubspot";
 import { Donation, getDonation, isKentaaDonationComplete, isKentaaWebhookValid, KentaaWebhookData } from "../utilities/Kentaa";
 
 async function handleKentaaWebhook(
@@ -59,7 +59,7 @@ async function handleKentaaWebhook(
   );
 
   try {
-    const formResult = await submitKentaaForm({
+    const formResult = await submitKentaaDonationForm({
       email: donation.email,
       firstname: donation.first_name,
       lastname: donation.last_name,

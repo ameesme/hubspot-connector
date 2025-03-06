@@ -180,7 +180,7 @@ $(document).ready(function () {
     const formData = new FormData(donationForm);
     const jsonData = Object.fromEntries(formData);
     const urlParams = new URLSearchParams(window.location.search);
-    const campaignId = urlParams.get('utm_campaign');
+    const campaignName = urlParams.get('utm_campaign');
 
     fetch("/create-donation", {
       method: "POST",
@@ -189,7 +189,7 @@ $(document).ready(function () {
       },
       body: JSON.stringify({
         ...jsonData,
-        campaign_id: campaignId
+        campaignName,
       }),
     }).then(async (response) => {
       if (response.ok) {

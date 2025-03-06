@@ -1,4 +1,4 @@
-export function submitKentaaForm(formData: {
+export function submitKentaaDonationForm(formData: {
   email: string;
   firstname: string;
   lastname: string;
@@ -85,7 +85,183 @@ export function submitKentaaForm(formData: {
     fields: data.fields.filter((field) => field.value !== undefined),
   };
 
-  console.log(JSON.stringify(filteredData, null, 2));
+  return fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(filteredData),
+  })
+    .then((response) => {
+      if (!response.ok) {
+        const responseData = response.json();
+        console.log(responseData);
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then((data: unknown): any => {
+      if (typeof data === "object" && data !== null) {
+        return data;
+      }
+      throw new Error("Invalid response format");
+    });
+}
+
+export async function submitStripeDonationForm(formData: {
+  email: string;
+  firstName: string;
+  lastName?: string;
+  companyName?: string;
+  companyURL?: string;
+  address?: string;
+  city?: string;
+  country?: string;
+  campaign_name?: string;
+  newsletter: boolean;
+}): Promise<any> {
+  const url = "https://api.hsforms.com/submissions/v3/integration/submit/5575635/8a61e0bc-07e0-4430-afc7-a00e4f45c96d";
+
+  const data = {
+    fields: [
+      {
+        objectTypeId: "0-1",
+        name: "email",
+        value: formData.email,
+      },
+      {
+        objectTypeId: "0-1",
+        name: "firstname", 
+        value: formData.firstName,
+      },
+      {
+        objectTypeId: "0-1",
+        name: "lastname",
+        value: formData.lastName,
+      },
+      {
+        objectTypeId: "0-1",
+        name: "name",
+        value: formData.companyName,
+      },
+      {
+        objectTypeId: "0-1",
+        name: "domain",
+        value: formData.companyURL,
+      },
+      {
+        objectTypeId: "0-1",
+        name: "address",
+        value: formData.address,
+      },
+      {
+        objectTypeId: "0-1",
+        name: "city",
+        value: formData.city,
+      },
+      {
+        objectTypeId: "0-1",
+        name: "country",
+        value: formData.country,
+      },
+      {
+        name: "campaign_name",
+        value: formData.campaign_name,
+      }
+    ],
+    context: {
+      pageUri: "https://sheltersuit.com/donate",
+      pageName: "Donation Form",
+    },
+    legalConsentOptions: {
+      consent: {
+        communications: [
+          {
+            value: true,
+            subscriptionTypeId: 105326153,
+            text: "I agree to receive donation confirmations and other essential information (* required)",
+          },
+          {
+            value: formData.newsletter || false,
+            subscriptionTypeId: 6120420,
+            text: "I want to receive updates via the newsletter",
+          },
+        ],
+      },
+    },
+  };
+
+  const filteredData = {
+    ...data,
+    fields: data.fields.filter((field) => field.value !== undefined),
+  };
+
+  return fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(filteredData),
+  })
+    .then((response) => {
+      if (!response.ok) {
+        const responseData = response.json();
+        console.log(responseData);
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then((data: unknown): any => {
+      if (typeof data === "object" && data !== null) {
+        return data;
+      }
+      throw new Error("Invalid response format");
+    });
+}
+
+export async function submitStripePaymentReceipt(formData: {
+  email: string;
+  amountInCents: number;
+  currency: string;
+  recurring: boolean;
+}): Promise<any> {
+  const url = "https://api.hsforms.com/submissions/v3/integration/submit/5575635/a638f105-8287-4d70-8830-4c0893bd5a3a";
+
+  const amount = (formData.amountInCents / 100).toFixed(2);
+
+  const data = {
+    fields: [
+      {
+        objectTypeId: "0-1",
+        name: "email",
+        value: formData.email,
+      },
+      {
+          objectTypeId: "0-1",
+          name: "stripe_donation_amount",
+          value: amount,
+      },
+      {
+          objectTypeId: "0-1",
+          name: "stripe_donation_currency",
+          value: formData.currency,
+      },
+      {
+          objectTypeId: "0-1",
+          name: "stripe_donation_recurring",
+          value: formData.recurring,
+      },
+    ],
+    context: {
+      pageUri: "https://sheltersuit.com/donate",
+      pageName: "Donation Form",
+    },
+  };
+
+  const filteredData = {
+    ...data,
+    fields: data.fields.filter((field) => field.value !== undefined),
+  };
 
   return fetch(url, {
     method: "POST",

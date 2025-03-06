@@ -1,6 +1,7 @@
 import express from "express";
 import Stripe from "stripe";
 import dotenv from "dotenv";
+import { submitStripeDonationForm } from "../utilities/Hubspot";
 
 dotenv.config();
 
@@ -31,7 +32,7 @@ interface FormData {
   country?: string;
 
   agreeCheck: boolean;
-  campaignId?: string;
+  campaignName?: string;
 }
 
 function isFormDataValid(data: FormData): boolean {
@@ -85,7 +86,8 @@ async function handleCreateDonation(
   const amount = customAmount || fixedAmount;
   const name = `${body.firstName}${body.lastName ? ` ${body.lastName}` : ""}`;
   const email = body.email;
-  const campaignId = body.campaignId;
+  const campaignName = body.campaignName;
+  const getReceipt = body.confirmationPDF;
 
   if (!amount) {
     res.status(400).send("Invalid donation amount");
@@ -110,15 +112,38 @@ async function handleCreateDonation(
     return;
   }
 
+  // Create Hubspot contact
+  try {
+    await submitStripeDonationForm({
+        email,
+        firstName: body.firstName,
+        lastName: body.lastName,
+        newsletter: body.newsletter,
+        companyName: body.companyName,
+        companyURL: body.companyURL,
+        address: body.address,
+        city: body.city,
+        country: body.country,
+        campaign_name: body.campaignName,
+    });
+  } catch (error) {
+    console.log(
+      `[HUBSPOT] Failed submitting form in Hubspot with email "${email}"`
+    );
+    console.error(error);
+    res.status(500).send("Failed to submit form");
+    return;
+  }
+
   // Create Stripe recurring payment intent
-  const metadata = campaignId
-    ? {
-        campaignId,
-        }
-    : undefined;
+  const metadata = {
+    campaignId: campaignId || null,
+    email,
+  };
   const paymentIntent = await stripe.checkout.sessions.create({
     mode: frequency === "oneTime" ? "payment" : "subscription",
     customer: stripeCustomer.id,
+    
     line_items: [
       {
         price_data: {
@@ -137,6 +162,9 @@ async function handleCreateDonation(
       },
     ],
     metadata,
+    payment_intent_data: {
+      receipt_email: getReceipt ? email : undefined,
+    },
     success_url: "https://sheltersuit.com/donate/success",
     cancel_url: "https://sheltersuit.com/donate/cancel",
   });

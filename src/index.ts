@@ -4,7 +4,9 @@ import dotenv from "dotenv";
 import fs from "fs";
 import https from "https";
 import path from "path";
+
 import handleKentaaWebhook from "./routes/kentaa-webhook";
+import handleStripeWebhook from "./routes/stripe-webhook";
 import handleCreateDonation from "./routes/create-donation";
 
 dotenv.config();
@@ -21,7 +23,9 @@ app.use(bodyParser.json());
 app.get("/webhook", async (req, res) => {
   res.status(200).send();
 });
+
 app.post("/webhook", handleKentaaWebhook);
+app.post("/stripe-webhook", handleStripeWebhook);
 app.post("/create-donation", handleCreateDonation);
 app.use("/donate", express.static(path.join(__dirname, "public")));
 
