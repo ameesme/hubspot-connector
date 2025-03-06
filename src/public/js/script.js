@@ -179,13 +179,18 @@ $(document).ready(function () {
 
     const formData = new FormData(donationForm);
     const jsonData = Object.fromEntries(formData);
+    const urlParams = new URLSearchParams(window.location.search);
+    const campaignId = urlParams.get('utm_campaign');
 
     fetch("/create-donation", {
       method: "POST",
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(jsonData),
+      body: JSON.stringify({
+        ...jsonData,
+        campaign_id: campaignId
+      }),
     }).then(async (response) => {
       if (response.ok) {
         const parsedResponse = await response.json();

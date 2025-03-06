@@ -31,6 +31,7 @@ interface FormData {
   country?: string;
 
   agreeCheck: boolean;
+  campaignId?: string;
 }
 
 function isFormDataValid(data: FormData): boolean {
@@ -62,7 +63,7 @@ function isFormDataValid(data: FormData): boolean {
 
 async function handleCreateDonation(
   req: express.Request,
-  res: express.Response
+  res: express.Response,
 ): Promise<void> {
   const { body }: { body: FormData } = req;
 
@@ -73,27 +74,23 @@ async function handleCreateDonation(
   }
 
   const frequency = body.donationFrequency;
-  const fixedAmount =
-    body.donationAmount === "other" ? null : parseFloat(body.donationAmount);
-  const customAmount =
-    body.donationAmount === "other"
-      ? body.donationFrequency === "oneTime"
-        ? parseFloat(body?.oneTimeCustomAmount as string)
-        : parseFloat(body?.monthlyCustomAmount as string)
-      : undefined;
+  const fixedAmount = body.donationAmount === "other"
+    ? null
+    : parseFloat(body.donationAmount);
+  const customAmount = body.donationAmount === "other"
+    ? body.donationFrequency === "oneTime"
+      ? parseFloat(body?.oneTimeCustomAmount as string)
+      : parseFloat(body?.monthlyCustomAmount as string)
+    : undefined;
   const amount = customAmount || fixedAmount;
   const name = `${body.firstName}${body.lastName ? ` ${body.lastName}` : ""}`;
   const email = body.email;
+  const campaignId = body.campaignId;
 
   if (!amount) {
     res.status(400).send("Invalid donation amount");
     return;
   }
-
-  console.log({
-    frequency,
-    amount,
-  });
 
   // Create Stripe customer
   const stripeCustomer = await stripe.customers.create({
@@ -114,6 +111,11 @@ async function handleCreateDonation(
   }
 
   // Create Stripe recurring payment intent
+  const metadata = campaignId
+    ? {
+        campaignId,
+        }
+    : undefined;
   const paymentIntent = await stripe.checkout.sessions.create({
     mode: frequency === "oneTime" ? "payment" : "subscription",
     customer: stripeCustomer.id,
@@ -125,13 +127,16 @@ async function handleCreateDonation(
             name: "Sheltersuit Donation",
           },
           unit_amount: amount * 100,
-          recurring: frequency !== "oneTime" ? {
-            interval:  "month",
-          } : undefined
+          recurring: frequency !== "oneTime"
+            ? {
+              interval: "month",
+            }
+            : undefined,
         },
         quantity: 1,
       },
     ],
+    metadata,
     success_url: "https://sheltersuit.com/donate/success",
     cancel_url: "https://sheltersuit.com/donate/cancel",
   });
@@ -145,7 +150,7 @@ async function handleCreateDonation(
   res.status(200).send(
     JSON.stringify({
       redirectUrl: paymentIntent.url,
-    })
+    }),
   );
   return;
 }
