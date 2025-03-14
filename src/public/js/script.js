@@ -198,11 +198,10 @@ $(document).ready(function () {
       if (response.ok) {
         const parsedResponse = await response.json();
         try {
-
-            window.postMessage(
-                { message: "redirect", redirect: parsedResponse.redirectUrl },
-                "*"
-            );
+          window.parent.postMessage(
+            { message: "redirect", redirect: parsedResponse.redirectUrl },
+            "*"
+          );
         } catch (e) {
           console.log("Failed to send message to parent window", e);
           window.location.href = parsedResponse.redirectUrl;
