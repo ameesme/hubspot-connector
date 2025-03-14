@@ -182,7 +182,7 @@ $(document).ready(function () {
     const urlParams = new URLSearchParams(window.location.search);
     const campaignName = urlParams.get("utm_campaign");
 
-    fetch("/create-donation", {
+    fetch("https://payments.sheltersuit.com/create-donation", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
