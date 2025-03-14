@@ -8,6 +8,7 @@ import path from "path";
 import handleKentaaWebhook from "./routes/kentaa-webhook";
 import handleStripeWebhook from "./routes/stripe-webhook";
 import handleCreateDonation from "./routes/create-donation";
+import Origins from "./middleware/origins";
 
 dotenv.config();
 if (!process.env.KENTAA_API_KEY) {
@@ -28,6 +29,7 @@ app.post("/webhook", handleKentaaWebhook);
 app.post("/stripe-webhook", handleStripeWebhook);
 app.post("/create-donation", handleCreateDonation);
 app.use("/donate", express.static(path.join(__dirname, "public")));
+app.use(Origins);
 
 if (process.env.NODE_ENV === "production") {
   if (!process.env.SSL_PRIVATE_KEY_PATH || !process.env.SSL_CERTIFICATE_PATH) {
