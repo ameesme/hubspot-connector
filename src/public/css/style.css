@@ -1,0 +1,29 @@
+@import url("https://fonts.googleapis.com/css2?family=Mulish:wght@800&family=Roboto&display=swap");
+
+.roboto {
+  font-family: "Roboto", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings: "wdth" 100;
+}
+
+.mulish {
+  font-family: "Mulish", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 800;
+  font-style: normal;
+}
+
+
+h1, h2, h3, h4 {
+    font-family: "Mulish", sans-serif;
+    font-weight: 800;
+    font-style: normal;
+}
+
+p, label, li, a {
+    font-family: "Roboto", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}

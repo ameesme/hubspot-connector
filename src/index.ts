@@ -20,6 +20,7 @@ if (!process.env.STRIPE_SECRET_KEY) {
 
 const app = express();
 app.use(bodyParser.json());
+app.use(Origins);
 
 app.get("/webhook", async (req, res) => {
   res.status(200).send();
@@ -29,7 +30,6 @@ app.post("/webhook", handleKentaaWebhook);
 app.post("/stripe-webhook", handleStripeWebhook);
 app.post("/create-donation", handleCreateDonation);
 app.use("/donate", express.static(path.join(__dirname, "public")));
-app.use(Origins);
 
 if (process.env.NODE_ENV === "production") {
   if (!process.env.SSL_PRIVATE_KEY_PATH || !process.env.SSL_CERTIFICATE_PATH) {

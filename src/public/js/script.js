@@ -180,21 +180,28 @@ $(document).ready(function () {
     const formData = new FormData(donationForm);
     const jsonData = Object.fromEntries(formData);
     const urlParams = new URLSearchParams(window.location.search);
-    const campaignName = urlParams.get('utm_campaign');
+    const campaignName = urlParams.get("utm_campaign");
 
     fetch("/create-donation", {
       method: "POST",
       headers: {
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         ...jsonData,
         campaignName,
+        locale: window.navigator
+          ? window.navigator.language || window.navigator.userLanguage
+          : undefined,
       }),
     }).then(async (response) => {
       if (response.ok) {
         const parsedResponse = await response.json();
         window.location.href = parsedResponse.redirectUrl;
+        window.postMessage(
+            { message: "redirect", redirect: parsedResponse.redirectUrl },
+            "*"
+        );
       } else {
         alert("An error occurred. Please try again later.");
       }

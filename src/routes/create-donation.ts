@@ -32,6 +32,7 @@ interface FormData {
 
   agreeCheck: boolean;
   campaignName?: string;
+  locale?: string;
 }
 
 function isFormDataValid(data: FormData): boolean {
@@ -85,7 +86,6 @@ async function handleCreateDonation(
   const amount = customAmount || fixedAmount;
   const name = `${body.firstName}${body.lastName ? ` ${body.lastName}` : ""}`;
   const email = body.email;
-  const campaignName = body.campaignName;
   const getReceipt = body.confirmationPDF;
 
   if (!amount) {
@@ -123,6 +123,7 @@ async function handleCreateDonation(
         city: body.city,
         country: body.country,
         campaign_name: body.campaignName,
+        // hs-language: body.locale,
     });
   } catch (error) {
     console.log(
@@ -161,8 +162,8 @@ async function handleCreateDonation(
     payment_intent_data: {
       receipt_email: (getReceipt && frequency === "oneTime") ? email : undefined,
     },
-    success_url: "https://sheltersuit.com/donate/success",
-    cancel_url: "https://sheltersuit.com/donate/cancel",
+    success_url: "https://sheltersuit.com/donate/thankyou",
+    cancel_url: "https://sheltersuit.com/donate",
   });
 
   if (!paymentIntent.url) {
