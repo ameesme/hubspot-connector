@@ -197,10 +197,16 @@ $(document).ready(function () {
     }).then(async (response) => {
       if (response.ok) {
         const parsedResponse = await response.json();
-        window.postMessage(
-            { message: "redirect", redirect: parsedResponse.redirectUrl },
-            "*"
-        );
+        try {
+
+            window.postMessage(
+                { message: "redirect", redirect: parsedResponse.redirectUrl },
+                "*"
+            );
+        } catch (e) {
+          console.log("Failed to send message to parent window", e);
+          window.location.href = parsedResponse.redirectUrl;
+        }
       } else {
         alert("An error occurred. Please try again later.");
       }
