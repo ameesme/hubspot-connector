@@ -204,7 +204,7 @@ $(document).ready(function () {
           );
         } catch (e) {
           console.log("Failed to send message to parent window", e);
-          window.location.href = parsedResponse.redirectUrl;
+          window.open(parsedResponse.redirectUrl, "_blank");
         }
       } else {
         alert("An error occurred. Please try again later.");

@@ -6,7 +6,6 @@ import { submitStripeDonationForm } from "../utilities/Hubspot";
 dotenv.config();
 
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? "", {
-  // httpClient: Stripe.createFetchHttpClient(),
   apiVersion: "2025-01-27.acacia",
   typescript: true,
 });
@@ -93,16 +92,46 @@ async function handleCreateDonation(
     return;
   }
 
-  // Create Stripe customer
-  const stripeCustomer = await stripe.customers.create({
+  // Check if customer already exists
+  const existingCustomer = await stripe.customers.list({
     email,
-    name,
-    address: {
-      line1: body.address,
-      city: body.city,
-      country: body.country,
-    },
+    limit: 1,
   });
+
+  let stripeCustomer;
+
+  if (existingCustomer.data.length && !existingCustomer.data[0].deleted) {
+    // Update customer with data
+    stripeCustomer = await stripe.customers.update(
+      existingCustomer.data[0].id,
+      {
+        name,
+        address: {
+          line1: body.address,
+          city: body.city,
+          country: body.country,
+        },
+        metadata: {
+          "company-url": body.companyURL || null,
+          "hubspot-integration": "true",
+        },
+      },
+    );
+  } else {
+    stripeCustomer = await stripe.customers.create({
+      email,
+      name,
+      address: {
+        line1: body.address,
+        city: body.city,
+        country: body.country,
+      },
+      metadata: {
+        "company-url": body.companyURL || null,
+        "hubspot-integration": "true",
+      },
+    });
+  }
 
   if (!stripeCustomer.id) {
     res.status(500).send("Failed to create Stripe customer");
@@ -113,21 +142,21 @@ async function handleCreateDonation(
   // Create Hubspot contact
   try {
     await submitStripeDonationForm({
-        email,
-        firstName: body.firstName,
-        lastName: body.lastName,
-        newsletter: body.newsletter,
-        companyName: body.companyName,
-        companyURL: body.companyURL,
-        address: body.address,
-        city: body.city,
-        country: body.country,
-        campaign_name: body.campaignName,
-        // hs-language: body.locale,
+      email,
+      firstName: body.firstName,
+      lastName: body.lastName,
+      newsletter: body.newsletter,
+      companyName: body.companyName,
+      companyURL: body.companyURL,
+      address: body.address,
+      city: body.city,
+      country: body.country,
+      campaign_name: body.campaignName,
+      locale: body.locale,
     });
   } catch (error) {
     console.log(
-      `[HUBSPOT] Failed submitting form in Hubspot with email "${email}"`
+      `[HUBSPOT] Failed submitting form in Hubspot with email "${email}"`,
     );
     console.error(error);
     res.status(500).send("Failed to submit form");
@@ -160,7 +189,9 @@ async function handleCreateDonation(
     ],
     metadata,
     payment_intent_data: {
-      receipt_email: (getReceipt && frequency === "oneTime") ? email : undefined,
+      receipt_email: (getReceipt && frequency === "oneTime")
+        ? email
+        : undefined,
     },
     success_url: "https://sheltersuit.com/donate/thankyou",
     cancel_url: "https://sheltersuit.com/donate",

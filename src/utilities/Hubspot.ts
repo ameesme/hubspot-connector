@@ -121,6 +121,7 @@ export async function submitStripeDonationForm(formData: {
   city?: string;
   country?: string;
   campaign_name?: string;
+  locale?: string;
   newsletter: boolean;
 }): Promise<any> {
   const url =
@@ -149,8 +150,8 @@ export async function submitStripeDonationForm(formData: {
         value: formData.companyName,
       },
       {
-        objectTypeId: "0-1",
-        name: "domain",
+        objectTypeId: "0-2",
+        name: "website",
         value: formData.companyURL,
       },
       {
@@ -172,6 +173,11 @@ export async function submitStripeDonationForm(formData: {
         objectTypeId: "0-1",
         name: "campaign_name",
         value: formData.campaign_name,
+      },
+      {
+        objectTypeId: "0-1",
+        name: "hs-language",
+        value: formData.locale,
       },
     ],
     context: {
@@ -235,6 +241,7 @@ export async function submitStripePaymentReceipt(formData: {
   amountInCents: number;
   currency: string;
   recurring: boolean;
+  companyURL?: string;
 }): Promise<any> {
   const url =
     "https://api.hsforms.com/submissions/v3/integration/submit/5575635/a638f105-8287-4d70-8830-4c0893bd5a3a";
@@ -262,6 +269,11 @@ export async function submitStripePaymentReceipt(formData: {
         objectTypeId: "0-1",
         name: "stripe_donation_recurring",
         value: formData.recurring,
+      },
+      {
+        objectTypeId: "0-2",
+        name: "website",
+        value: formData.companyURL,
       },
     ],
     context: {
