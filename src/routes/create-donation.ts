@@ -101,6 +101,7 @@ async function handleCreateDonation(
   let stripeCustomer;
 
   if (existingCustomer.data.length && !existingCustomer.data[0].deleted) {
+    console.log(`[STRIPE] Customer already exists: ${existingCustomer.data[0].id}`);
     // Update customer with data
     stripeCustomer = await stripe.customers.update(
       existingCustomer.data[0].id,
@@ -118,6 +119,7 @@ async function handleCreateDonation(
       },
     );
   } else {
+    console.log("[STRIPE] Creating new customer");
     stripeCustomer = await stripe.customers.create({
       email,
       name,
