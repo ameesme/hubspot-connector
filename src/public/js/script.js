@@ -197,7 +197,6 @@ $(document).ready(function () {
     }).then(async (response) => {
       if (response.ok) {
         const parsedResponse = await response.json();
-        window.location.href = parsedResponse.redirectUrl;
         window.postMessage(
             { message: "redirect", redirect: parsedResponse.redirectUrl },
             "*"
