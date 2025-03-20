@@ -272,7 +272,7 @@ export async function submitStripePaymentReceipt(formData: {
       },
       {
         objectTypeId: "0-2",
-        name: "website",
+        name: "domain",
         value: formData.companyURL,
       },
     ],
