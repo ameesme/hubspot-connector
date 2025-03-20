@@ -145,27 +145,27 @@ export async function submitStripeDonationForm(formData: {
         value: formData.lastName,
       },
       {
-        objectTypeId: "0-1",
+        objectTypeId: "0-2",
         name: "name",
         value: formData.companyName,
       },
       {
         objectTypeId: "0-2",
-        name: "website",
+        name: "domain",
         value: formData.companyURL,
       },
       {
-        objectTypeId: "0-1",
+        objectTypeId: "0-2",
         name: "address",
         value: formData.address,
       },
       {
-        objectTypeId: "0-1",
+        objectTypeId: "0-2",
         name: "city",
         value: formData.city,
       },
       {
-        objectTypeId: "0-1",
+        objectTypeId: "0-2",
         name: "country",
         value: formData.country,
       },
