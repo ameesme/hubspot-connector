@@ -177,7 +177,7 @@ export async function submitStripeDonationForm(formData: {
       {
         objectTypeId: "0-1",
         name: "hs-language",
-        value: formData.locale,
+        value: (formData.locale || "en").toLowerCase(),
       },
     ],
     context: {
