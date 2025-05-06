@@ -61,9 +61,16 @@ function isFormDataValid(data: FormData): boolean {
   return true;
 }
 
+const redirectUrlMap: Record<string, string> = {
+  "nl-NL": "https://sheltersuit.com/nl/doneer/bedankt",
+  nl: "https://sheltersuit.com/nl/doneer/bedankt",
+  "de-DE": "https://sheltersuit.com/de/spenden/danke",
+  de: "https://sheltersuit.com/de/spenden/danke",
+};
+
 async function handleCreateDonation(
   req: express.Request,
-  res: express.Response,
+  res: express.Response
 ): Promise<void> {
   const { body }: { body: FormData } = req;
 
@@ -74,14 +81,14 @@ async function handleCreateDonation(
   }
 
   const frequency = body.donationFrequency;
-  const fixedAmount = body.donationAmount === "other"
-    ? null
-    : parseFloat(body.donationAmount);
-  const customAmount = body.donationAmount === "other"
-    ? body.donationFrequency === "oneTime"
-      ? parseFloat(body?.oneTimeCustomAmount as string)
-      : parseFloat(body?.monthlyCustomAmount as string)
-    : undefined;
+  const fixedAmount =
+    body.donationAmount === "other" ? null : parseFloat(body.donationAmount);
+  const customAmount =
+    body.donationAmount === "other"
+      ? body.donationFrequency === "oneTime"
+        ? parseFloat(body?.oneTimeCustomAmount as string)
+        : parseFloat(body?.monthlyCustomAmount as string)
+      : undefined;
   const amount = customAmount || fixedAmount;
   const name = `${body.firstName}${body.lastName ? ` ${body.lastName}` : ""}`;
   const email = body.email;
@@ -101,7 +108,9 @@ async function handleCreateDonation(
   let stripeCustomer;
 
   if (existingCustomer.data.length && !existingCustomer.data[0].deleted) {
-    console.log(`[STRIPE] Customer already exists: ${existingCustomer.data[0].id}`);
+    console.log(
+      `[STRIPE] Customer already exists: ${existingCustomer.data[0].id}`
+    );
     // Update customer with data
     stripeCustomer = await stripe.customers.update(
       existingCustomer.data[0].id,
@@ -116,7 +125,7 @@ async function handleCreateDonation(
           "company-url": body.companyURL || null,
           "hubspot-integration": "true",
         },
-      },
+      }
     );
   } else {
     console.log("[STRIPE] Creating new customer");
@@ -158,7 +167,7 @@ async function handleCreateDonation(
     });
   } catch (error) {
     console.log(
-      `[HUBSPOT] Failed submitting form in Hubspot with email "${email}"`,
+      `[HUBSPOT] Failed submitting form in Hubspot with email "${email}"`
     );
     console.error(error);
     res.status(500).send("Failed to submit form");
@@ -169,6 +178,9 @@ async function handleCreateDonation(
   const metadata = {
     email,
   };
+  const successUrl =
+    (body.locale && redirectUrlMap[body.locale]) ??
+    "https://sheltersuit.com/donate/thankyou";
   const paymentIntent = await stripe.checkout.sessions.create({
     mode: frequency === "oneTime" ? "payment" : "subscription",
     customer: stripeCustomer.id,
@@ -180,22 +192,21 @@ async function handleCreateDonation(
             name: "Sheltersuit Donation",
           },
           unit_amount: amount * 100,
-          recurring: frequency !== "oneTime"
-            ? {
-              interval: "month",
-            }
-            : undefined,
+          recurring:
+            frequency !== "oneTime"
+              ? {
+                  interval: "month",
+                }
+              : undefined,
         },
         quantity: 1,
       },
     ],
     metadata,
     payment_intent_data: {
-      receipt_email: (getReceipt && frequency === "oneTime")
-        ? email
-        : undefined,
+      receipt_email: getReceipt && frequency === "oneTime" ? email : undefined,
     },
-    success_url: "https://sheltersuit.com/donate/thankyou",
+    success_url: successUrl,
     cancel_url: "https://sheltersuit.com/donate",
   });
 
@@ -208,7 +219,7 @@ async function handleCreateDonation(
   res.status(200).send(
     JSON.stringify({
       redirectUrl: paymentIntent.url,
-    }),
+    })
   );
   return;
 }

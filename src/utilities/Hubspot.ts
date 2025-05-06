@@ -58,20 +58,17 @@ export function submitKentaaDonationForm(formData: {
     legalConsentOptions: {
       consent: {
         consentToProcess: true,
-        text:
-          "I agree to allow Sheltersuit to store and process my personal data.",
+        text: "I agree to allow Sheltersuit to store and process my personal data.",
         communications: [
           {
             value: true,
             subscriptionTypeId: 105326153,
-            text:
-              "I agree to receive donation confirmations and other essential information (* required)",
+            text: "I agree to receive donation confirmations and other essential information (* required)",
           },
           {
             value: formData.subscribeOneOnOne || false,
             subscriptionTypeId: 6120458,
-            text:
-              "Employees can contact me via one to one communication (* required)",
+            text: "Employees can contact me via one to one communication (* required)",
           },
           {
             value: formData.subscribeNews || false,
@@ -145,6 +142,11 @@ export async function submitStripeDonationForm(formData: {
         value: formData.lastName,
       },
       {
+        objectTypeId: "0-1",
+        name: "donates_as_company",
+        value: !!formData.companyName,
+      },
+      {
         objectTypeId: "0-2",
         name: "name",
         value: formData.companyName,
@@ -187,14 +189,12 @@ export async function submitStripeDonationForm(formData: {
     legalConsentOptions: {
       consent: {
         consentToProcess: true,
-        text:
-          "I agree to allow Sheltersuit to store and process my personal data.",
+        text: "I agree to allow Sheltersuit to store and process my personal data.",
         communications: [
           {
             value: true,
             subscriptionTypeId: 105326153,
-            text:
-              "I agree to receive donation confirmations and other essential information (* required)",
+            text: "I agree to receive donation confirmations and other essential information (* required)",
           },
           {
             value: !!formData.newsletter || false,
@@ -208,8 +208,8 @@ export async function submitStripeDonationForm(formData: {
 
   const filteredData = {
     ...data,
-    fields: data.fields.filter((field) =>
-      field.value !== undefined && field.value !== null
+    fields: data.fields.filter(
+      (field) => field.value !== undefined && field.value !== null
     ),
   };
 
@@ -283,8 +283,7 @@ export async function submitStripePaymentReceipt(formData: {
     legalConsentOptions: {
       consent: {
         consentToProcess: true,
-        text:
-          "I agree to allow Sheltersuit to store and process my personal data.",
+        text: "I agree to allow Sheltersuit to store and process my personal data.",
       },
     },
   };

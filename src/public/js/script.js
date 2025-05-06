@@ -91,9 +91,14 @@ $(document).ready(function () {
     }
   });
   ["oneTime25", "oneTime50", "oneTime100"].forEach((id) => {
-    document.getElementById(id).addEventListener("change", () => {
-      oneTimeOtherInput.style.display = "none";
-    });
+    try {
+      document.getElementById(id).addEventListener("change", () => {
+        oneTimeOtherInput.style.display = "none";
+      });
+    } catch (e) {
+      console.log("Failed to register event listener");
+      console.log(e);
+    }
   });
 
   // Show/hide â€œOtherâ€ input for monthly
