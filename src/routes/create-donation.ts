@@ -205,6 +205,9 @@ async function handleCreateDonation(
     metadata,
     payment_intent_data: {
       receipt_email: getReceipt && frequency === "oneTime" ? email : undefined,
+      metadata: {
+        campaign_name: body.campaignName,
+      },
     },
     success_url: successUrl,
     cancel_url: "https://sheltersuit.com/donate",
