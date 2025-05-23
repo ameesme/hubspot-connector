@@ -206,7 +206,7 @@ async function handleCreateDonation(
     payment_intent_data: {
       receipt_email: getReceipt && frequency === "oneTime" ? email : undefined,
       metadata: {
-        campaign_name: body.campaignName,
+        campaign_name: body.campaignName || "none",
       },
     },
     success_url: successUrl,
