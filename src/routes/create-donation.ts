@@ -70,7 +70,7 @@ const redirectUrlMap: Record<string, string> = {
 
 async function handleCreateDonation(
   req: express.Request,
-  res: express.Response
+  res: express.Response,
 ): Promise<void> {
   const { body }: { body: FormData } = req;
 
@@ -109,7 +109,7 @@ async function handleCreateDonation(
 
   if (existingCustomer.data.length && !existingCustomer.data[0].deleted) {
     console.log(
-      `[STRIPE] Customer already exists: ${existingCustomer.data[0].id}`
+      `[STRIPE] Customer already exists: ${existingCustomer.data[0].id}`,
     );
     // Update customer with data
     stripeCustomer = await stripe.customers.update(
@@ -125,7 +125,7 @@ async function handleCreateDonation(
           "company-url": body.companyURL || null,
           "hubspot-integration": "true",
         },
-      }
+      },
     );
   } else {
     console.log("[STRIPE] Creating new customer");
@@ -167,7 +167,7 @@ async function handleCreateDonation(
     });
   } catch (error) {
     console.log(
-      `[HUBSPOT] Failed submitting form in Hubspot with email "${email}"`
+      `[HUBSPOT] Failed submitting form in Hubspot with email "${email}"`,
     );
     console.error(error);
     res.status(500).send("Failed to submit form");
@@ -181,6 +181,13 @@ async function handleCreateDonation(
   const successUrl =
     (body.locale && redirectUrlMap[body.locale]) ??
     "https://sheltersuit.com/donate/thankyou";
+
+  const paymentIntentData = frequency === "oneTime" && {
+    receipt_email: getReceipt ? email : undefined,
+    metadata: {
+      campaign_name: body.campaignName || "none",
+    },
+  };
   const paymentIntent = await stripe.checkout.sessions.create({
     mode: frequency === "oneTime" ? "payment" : "subscription",
     customer: stripeCustomer.id,
@@ -203,12 +210,7 @@ async function handleCreateDonation(
       },
     ],
     metadata,
-    payment_intent_data: {
-      receipt_email: getReceipt && frequency === "oneTime" ? email : undefined,
-      metadata: {
-        campaign_name: body.campaignName || "none",
-      },
-    },
+    payment_intent_data: paymentIntentData,
     success_url: successUrl,
     cancel_url: "https://sheltersuit.com/donate",
   });
@@ -222,7 +224,7 @@ async function handleCreateDonation(
   res.status(200).send(
     JSON.stringify({
       redirectUrl: paymentIntent.url,
-    })
+    }),
   );
   return;
 }
