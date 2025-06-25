@@ -210,7 +210,7 @@ async function handleCreateDonation(
       },
     ],
     metadata,
-    payment_intent_data: paymentIntentData,
+    payment_intent_data: paymentIntentData || undefined,
     success_url: successUrl,
     cancel_url: "https://sheltersuit.com/donate",
   });
