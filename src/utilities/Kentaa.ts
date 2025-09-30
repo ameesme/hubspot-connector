@@ -1,6 +1,6 @@
 export interface Donation {
   id: number;
-  site_id: number;
+  site_id: number; //4038 (main sheltersuit fundraiser), 4555 (sleepout)
   action_id?: number;
   created_at: string;
   updated_at: string;
@@ -46,7 +46,6 @@ export interface Address {
   country: string;
 }
 
-
 export interface KentaaWebhookData {
   object_type: string;
   object_id: number;
@@ -76,7 +75,6 @@ export function isKentaaDonationComplete(data: Donation): boolean {
 
   return true;
 }
-
 
 export function getDonation(apiKey: string, id: number): Promise<Donation> {
   return fetch(`https://api.kentaa.nl/v1/donations/${id}`, {

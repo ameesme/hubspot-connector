@@ -1,10 +1,16 @@
 import express from "express";
 import { submitKentaaDonationForm } from "../utilities/Hubspot";
-import { Donation, getDonation, isKentaaDonationComplete, isKentaaWebhookValid, KentaaWebhookData } from "../utilities/Kentaa";
+import {
+  Donation,
+  getDonation,
+  isKentaaDonationComplete,
+  isKentaaWebhookValid,
+  KentaaWebhookData,
+} from "../utilities/Kentaa";
 
 async function handleKentaaWebhook(
   req: express.Request,
-  res: express.Response
+  res: express.Response,
 ): Promise<void> {
   const { body }: { body: KentaaWebhookData } = req;
   const requestBodyValid = isKentaaWebhookValid(body);
@@ -15,7 +21,7 @@ async function handleKentaaWebhook(
   }
 
   console.log(
-    `[WEBHOOK] Received donation update for donation "${body.object_id}"`
+    `[WEBHOOK] Received donation update for donation "${body.object_id}"`,
   );
 
   // Lookup Donation
@@ -24,7 +30,7 @@ async function handleKentaaWebhook(
   try {
     donation = await getDonation(
       process.env.KENTAA_API_KEY as string,
-      donationId
+      donationId,
     );
   } catch (error) {
     console.error(error);
@@ -46,7 +52,7 @@ async function handleKentaaWebhook(
 
   if (!donationComplete) {
     console.log(
-      `[KENTAA] Missing donation details for donation "${body.object_id}"`
+      `[KENTAA] Missing donation details for donation "${body.object_id}"`,
     );
 
     res.status(400).send("Donation details are incomplete");
@@ -55,7 +61,7 @@ async function handleKentaaWebhook(
 
   // Submit form in HubSpot
   console.log(
-    `[HUBSPOT] Submitting form in Hubspot with email "${donation.email}"`
+    `[HUBSPOT] Submitting form in Hubspot with email "${donation.email}"`,
   );
 
   try {
@@ -67,13 +73,13 @@ async function handleKentaaWebhook(
       subscribeOneOnOne: donation.newsletter,
       subscribeNews: donation.newsletter,
       amount: parseFloat(donation.total_amount),
-      actionId: donation.action_id,
+      actionId: donation.site_id,
       company: donation.company,
     });
     console.log(formResult);
   } catch (error) {
     console.log(
-      `[HUBSPOT] Failed submitting form in Hubspot with email "${donation.email}"`
+      `[HUBSPOT] Failed submitting form in Hubspot with email "${donation.email}"`,
     );
     console.error(error);
     res.status(500).send("Failed to submit form");
