@@ -87,6 +87,7 @@ export function getDonation(apiKey: string, id: number): Promise<Donation> {
       if (typeof data === "object" && data !== null && "donation" in data) {
         return data.donation as Donation;
       }
+      console.log({ data });
       throw new Error("Invalid response format");
     });
 }
