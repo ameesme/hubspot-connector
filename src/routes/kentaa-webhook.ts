@@ -2,6 +2,7 @@ import express from "express";
 import { submitKentaaDonationForm } from "../utilities/Hubspot";
 import {
   Donation,
+  getApiKeyForSite,
   getDonation,
   isKentaaDonationComplete,
   isKentaaWebhookValid,
@@ -28,10 +29,8 @@ async function handleKentaaWebhook(
   const donationId = body.object_id;
   let donation: Donation | null = null;
   try {
-    donation = await getDonation(
-      process.env.KENTAA_API_KEY as string,
-      donationId,
-    );
+    const apiKey = getApiKeyForSite(body.site_id);
+    donation = await getDonation(apiKey, donationId);
   } catch (error) {
     console.error(error);
     console.log(`[KENTAA] Failed to fetch donation "${body.object_id}"`);

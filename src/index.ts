@@ -11,8 +11,29 @@ import handleCreateDonation from "./routes/create-donation";
 import Origins from "./middleware/origins";
 
 dotenv.config();
-if (!process.env.KENTAA_API_KEY) {
-  throw new Error("API keys are missing");
+
+// Validate Kentaa API keys
+const kentaaApiKeyGlobal = process.env.KENTAA_API_KEY;
+const kentaaApiKey4038 = process.env.KENTAA_API_KEY_4038;
+const kentaaApiKey4555 = process.env.KENTAA_API_KEY_4555;
+
+if (!kentaaApiKeyGlobal && !kentaaApiKey4038 && !kentaaApiKey4555) {
+  throw new Error(
+    "No Kentaa API keys found. Please set KENTAA_API_KEY_4038, KENTAA_API_KEY_4555, or KENTAA_API_KEY",
+  );
+}
+
+// Log which keys are configured
+if (kentaaApiKey4038) {
+  console.log("[CONFIG] Kentaa API key for site 4038 (main) is configured");
+}
+if (kentaaApiKey4555) {
+  console.log("[CONFIG] Kentaa API key for site 4555 (sleepout) is configured");
+}
+if (kentaaApiKeyGlobal && (!kentaaApiKey4038 || !kentaaApiKey4555)) {
+  console.log(
+    "[CONFIG] Using fallback KENTAA_API_KEY for sites without specific keys",
+  );
 }
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error("API keys are missing");

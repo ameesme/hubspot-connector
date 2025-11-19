@@ -76,6 +76,27 @@ export function isKentaaDonationComplete(data: Donation): boolean {
   return true;
 }
 
+export function getApiKeyForSite(siteId: number): string {
+  const siteSpecificKey = process.env[`KENTAA_API_KEY_${siteId}`];
+  if (siteSpecificKey) {
+    return siteSpecificKey;
+  }
+
+  // Fall back to global API key
+  const globalKey = process.env.KENTAA_API_KEY;
+  if (globalKey) {
+    console.warn(
+      `Using fallback KENTAA_API_KEY for site ${siteId}. Consider setting KENTAA_API_KEY_${siteId}`,
+    );
+    return globalKey;
+  }
+
+  // No API key found
+  throw new Error(
+    `No Kentaa API key found for site ${siteId}. Please set KENTAA_API_KEY_${siteId} or KENTAA_API_KEY in environment variables.`,
+  );
+}
+
 export function getDonation(apiKey: string, id: number): Promise<Donation> {
   return fetch(`https://api.kentaa.nl/v1/donations/${id}`, {
     headers: {
