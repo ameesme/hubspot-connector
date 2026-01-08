@@ -191,6 +191,9 @@ async function handleCreateDonation(
   const paymentIntent = await stripe.checkout.sessions.create({
     mode: frequency === "oneTime" ? "payment" : "subscription",
     customer: stripeCustomer.id,
+    invoice_creation: {
+      enabled: frequency === "oneTime",
+    },
     line_items: [
       {
         price_data: {
