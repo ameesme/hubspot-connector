@@ -2,6 +2,7 @@ import express from "express";
 import Stripe from "stripe";
 import dotenv from "dotenv";
 import { submitStripeDonationForm } from "../utilities/Hubspot";
+import { getClientIp, getCountryFromIp } from "../utilities/Geolocation";
 
 dotenv.config();
 
@@ -99,6 +100,19 @@ async function handleCreateDonation(
     return;
   }
 
+  // Get country from IP if not provided in form
+  let country = body.country;
+  if (!country) {
+    const clientIp = getClientIp(req);
+    const detectedCountry = await getCountryFromIp(clientIp);
+    if (detectedCountry) {
+      country = detectedCountry;
+      console.log(
+        `[GEOLOCATION] Using detected country: ${country} for email: ${email}`,
+      );
+    }
+  }
+
   // Check if customer already exists
   const existingCustomer = await stripe.customers.list({
     email,
@@ -119,7 +133,7 @@ async function handleCreateDonation(
         address: {
           line1: body.address,
           city: body.city,
-          country: body.country,
+          country: country,
         },
         metadata: {
           "company-url": body.companyURL || null,
@@ -135,7 +149,7 @@ async function handleCreateDonation(
       address: {
         line1: body.address,
         city: body.city,
-        country: body.country,
+        country: country,
       },
       metadata: {
         "company-url": body.companyURL || null,
@@ -161,7 +175,7 @@ async function handleCreateDonation(
       companyURL: body.companyURL,
       address: body.address,
       city: body.city,
-      country: body.country,
+      country: country,
       campaign_name: body.campaignName,
       locale: body.locale,
     });

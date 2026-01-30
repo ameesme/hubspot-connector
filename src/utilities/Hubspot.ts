@@ -173,6 +173,11 @@ export async function submitStripeDonationForm(formData: {
       },
       {
         objectTypeId: "0-1",
+        name: "country",
+        value: formData.country,
+      },
+      {
+        objectTypeId: "0-1",
         name: "campaign_name",
         value: formData.campaign_name,
       },
@@ -209,7 +214,7 @@ export async function submitStripeDonationForm(formData: {
   const filteredData = {
     ...data,
     fields: data.fields.filter(
-      (field) => field.value !== undefined && field.value !== null
+      (field) => field.value !== undefined && field.value !== null,
     ),
   };
 
