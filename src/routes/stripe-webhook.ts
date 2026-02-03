@@ -61,8 +61,11 @@ async function handleStripeWebhook(
 
     // Check if the customer has hubspot-integration
     if (!metadata || !metadata["hubspot-integration"]) {
-      console.log("[WEBHOOK] Customer not found", event);
-      res.status(200).send("Customer not found");
+      console.log(
+        "[WEBHOOK] Customer lacks hubspot-integration metadata",
+        event,
+      );
+      res.status(200).send("Customer lacks hubspot-integration metadata");
       return;
     }
 
