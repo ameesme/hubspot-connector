@@ -29,7 +29,6 @@ async function handleStripeWebhook(
     console.log(
       `[WEBHOOK] Payment completed for session ${event.data.object.id}`,
     );
-    const customerEmail = event.data.object.customer_email;
     const totalAmount = event.data.object.amount_paid;
     const currency = event.data.object.currency;
     const recurring = !!event.data.object.subscription;
@@ -38,6 +37,9 @@ async function handleStripeWebhook(
     const customer = await stripe.customers.retrieve(
       event.data.object.customer as string,
     );
+
+    const customerEmail =
+      event.data.object.customer_email || (customer as Stripe.Customer).email;
 
     if (
       !customerEmail ||
