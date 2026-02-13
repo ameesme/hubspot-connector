@@ -50,6 +50,6 @@ app.post("/stripe-webhook", handleStripeWebhook);
 app.post("/create-donation", handleCreateDonation);
 app.use("/donate", express.static(path.join(__dirname, "public")));
 
-app.listen(3000, () => {
-  console.log(`[SERVER] Server is running on port 3000`);
+app.listen(3001, () => {
+  console.log(`[SERVER] Server is running on port 3001`);
 });
