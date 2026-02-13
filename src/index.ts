@@ -1,8 +1,6 @@
 import bodyParser from "body-parser";
 import express from "express";
 import dotenv from "dotenv";
-import fs from "fs";
-import https from "https";
 import path from "path";
 
 import handleKentaaWebhook from "./routes/kentaa-webhook";
@@ -52,26 +50,6 @@ app.post("/stripe-webhook", handleStripeWebhook);
 app.post("/create-donation", handleCreateDonation);
 app.use("/donate", express.static(path.join(__dirname, "public")));
 
-if (process.env.NODE_ENV === "production") {
-  if (!process.env.SSL_PRIVATE_KEY_PATH || !process.env.SSL_CERTIFICATE_PATH) {
-    throw new Error("SSL paths are missing");
-  }
-
-  const privateKey = fs.readFileSync(process.env.SSL_PRIVATE_KEY_PATH);
-  const certificate = fs.readFileSync(process.env.SSL_CERTIFICATE_PATH);
-
-  https
-    .createServer(
-      {
-        key: privateKey,
-        cert: certificate,
-      },
-      app
-    )
-    .listen(443);
-  console.log(`[SERVER] Server is running on port 443`);
-} else {
-  app.listen(3000, () => {
-    console.log(`[SERVER] Server is running on port 3000`);
-  });
-}
+app.listen(3000, () => {
+  console.log(`[SERVER] Server is running on port 3000`);
+});
