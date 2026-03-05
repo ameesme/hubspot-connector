@@ -77,6 +77,60 @@ async function handleStripeWebhook(
       currency,
       recurring,
       companyURL: metadata["company-url"],
+      payment_status: "Yes",
+    });
+  }
+
+  if (eventType === "invoice.payment_failed") {
+    const event = req.body as Stripe.InvoicePaymentFailedEvent;
+
+    console.log(
+      `[WEBHOOK] Payment failed for invoice ${event.data.object.id}`,
+    );
+
+    const currency = event.data.object.currency;
+    const recurring = !!event.data.object.subscription;
+
+    // Get Stripe Customer
+    const customer = await stripe.customers.retrieve(
+      event.data.object.customer as string,
+    );
+
+    const customerEmail =
+      event.data.object.customer_email || (customer as Stripe.Customer).email;
+
+    if (!customerEmail || !currency || typeof recurring !== "boolean") {
+      console.log("[WEBHOOK] Invalid event data", event);
+      res.status(400).send("Invalid event data");
+      return;
+    }
+
+    if (!customer || customer.deleted) {
+      console.log("[WEBHOOK] Customer not found", event);
+      res.status(200).send("Customer not found");
+      return;
+    }
+
+    // Get customer metadata
+    const metadata = customer.metadata;
+
+    // Check if the customer has hubspot-integration
+    if (!metadata || !metadata["hubspot-integration"]) {
+      console.log(
+        "[WEBHOOK] Customer lacks hubspot-integration metadata",
+        event,
+      );
+      res.status(200).send("Customer lacks hubspot-integration metadata");
+      return;
+    }
+
+    await submitStripePaymentReceipt({
+      email: customerEmail,
+      amountInCents: 0,
+      currency,
+      recurring,
+      companyURL: metadata["company-url"],
+      payment_status: "No",
     });
   }
 

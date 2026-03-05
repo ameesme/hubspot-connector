@@ -247,6 +247,7 @@ export async function submitStripePaymentReceipt(formData: {
   currency: string;
   recurring: boolean;
   companyURL?: string;
+  payment_status: "Yes" | "No";
 }): Promise<any> {
   const url =
     "https://api.hsforms.com/submissions/v3/integration/submit/5575635/a638f105-8287-4d70-8830-4c0893bd5a3a";
@@ -274,6 +275,11 @@ export async function submitStripePaymentReceipt(formData: {
         objectTypeId: "0-1",
         name: "stripe_donation_recurring",
         value: formData.recurring,
+      },
+      {
+        objectTypeId: "0-1",
+        name: "payment_status",
+        value: formData.payment_status,
       },
       {
         objectTypeId: "0-2",
