@@ -2,6 +2,7 @@ import express from "express";
 import Stripe from "stripe";
 import dotenv from "dotenv";
 import { submitStripePaymentReceipt } from "../utilities/Hubspot";
+import { sendGA4Purchase } from "../utilities/GA4";
 
 dotenv.config();
 
@@ -60,6 +61,7 @@ async function handleStripeWebhook(
 
     // Get customer metadata
     const metadata = customer.metadata;
+    const clientId = metadata["ga4-client-id"];
 
     // Check if the customer has hubspot-integration
     if (!metadata || !metadata["hubspot-integration"]) {
@@ -79,6 +81,19 @@ async function handleStripeWebhook(
       companyURL: metadata["company-url"],
       payment_status: "Yes",
     });
+
+    // Send GA4 purchase event
+    if (clientId) {
+      await sendGA4Purchase({
+        clientId,
+        transactionId: event.data.object.id,
+        value: totalAmount / 100, // cents to euros
+        currency,
+        recurring,
+        isCompany: metadata["is-company"] === "true",
+        locale: metadata["locale"] || undefined,
+      });
+    }
   }
 
   if (eventType === "invoice.payment_failed") {

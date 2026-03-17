@@ -150,7 +150,7 @@ $(document).ready(function () {
 
   // ===== FINAL SUBMIT HANDLER =====
   const donationForm = document.getElementById("donationForm");
-  donationForm.addEventListener("submit", (e) => {
+  donationForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     // Simple check if required fields in Step 2 are filled:
@@ -187,6 +187,23 @@ $(document).ready(function () {
     const urlParams = new URLSearchParams(window.location.search);
     const campaignName = urlParams.get("utm_campaign");
 
+    // Capture GA4 client_id
+    let clientId = null;
+    try {
+      if (typeof gtag !== 'undefined') {
+        await new Promise((resolve) => {
+          const timeout = setTimeout(resolve, 200); // Don't wait more than 200ms
+          gtag('get', 'G-996X9GF1B5', 'client_id', (value) => {
+            clientId = value;
+            clearTimeout(timeout);
+            resolve();
+          });
+        });
+      }
+    } catch (e) {
+      console.log('[GA4] Failed to capture client_id', e);
+    }
+
     fetch("https://payments.sheltersuit.com/create-donation", {
       method: "POST",
       headers: {
@@ -194,6 +211,7 @@ $(document).ready(function () {
       },
       body: JSON.stringify({
         ...jsonData,
+        clientId,
         campaignName,
         locale: window.navigator
           ? window.navigator.language || window.navigator.userLanguage

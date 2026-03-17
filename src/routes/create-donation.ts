@@ -33,6 +33,7 @@ interface FormData {
   agreeCheck: boolean;
   campaignName?: string;
   locale?: string;
+  clientId?: string;
 }
 
 function isFormDataValid(data: FormData): boolean {
@@ -138,6 +139,9 @@ async function handleCreateDonation(
         metadata: {
           "company-url": body.companyURL || null,
           "hubspot-integration": "true",
+          "ga4-client-id": body.clientId || null,
+          "is-company": body.isCompany ? "true" : "false",
+          locale: body.locale || null,
         },
       },
     );
@@ -154,6 +158,9 @@ async function handleCreateDonation(
       metadata: {
         "company-url": body.companyURL || null,
         "hubspot-integration": "true",
+        "ga4-client-id": body.clientId || null,
+        "is-company": body.isCompany ? "true" : "false",
+        locale: body.locale || null,
       },
     });
   }
