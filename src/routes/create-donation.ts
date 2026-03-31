@@ -34,6 +34,7 @@ interface FormData {
   campaignName?: string;
   locale?: string;
   clientId?: string;
+  sessionId?: string;
 }
 
 function isFormDataValid(data: FormData): boolean {
@@ -140,6 +141,7 @@ async function handleCreateDonation(
           "company-url": body.companyURL || null,
           "hubspot-integration": "true",
           "ga4-client-id": body.clientId || null,
+          "ga4-session-id": body.sessionId || null,
           "is-company": body.isCompany ? "true" : "false",
           locale: body.locale || null,
         },
@@ -159,6 +161,7 @@ async function handleCreateDonation(
         "company-url": body.companyURL || null,
         "hubspot-integration": "true",
         "ga4-client-id": body.clientId || null,
+        "ga4-session-id": body.sessionId || null,
         "is-company": body.isCompany ? "true" : "false",
         locale: body.locale || null,
       },
@@ -199,9 +202,11 @@ async function handleCreateDonation(
   const metadata = {
     email,
   };
-  const successUrl =
+  const baseSuccessUrl =
     (body.locale && redirectUrlMap[body.locale]) ??
     "https://sheltersuit.com/donate/thankyou";
+  const transactionType = frequency === "oneTime" ? "eenmalig" : "maandelijks";
+  const successUrl = `${baseSuccessUrl}?tid={CHECKOUT_SESSION_ID}&tr=${amount.toFixed(2)}&currency=EUR&tt=${transactionType}`;
 
   const paymentIntentData = frequency === "oneTime" && {
     receipt_email: getReceipt ? email : undefined,

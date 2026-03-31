@@ -62,6 +62,7 @@ async function handleStripeWebhook(
     // Get customer metadata
     const metadata = customer.metadata;
     const clientId = metadata["ga4-client-id"];
+    const sessionId = metadata["ga4-session-id"];
 
     // Check if the customer has hubspot-integration
     if (!metadata || !metadata["hubspot-integration"]) {
@@ -86,6 +87,7 @@ async function handleStripeWebhook(
     if (clientId) {
       await sendGA4Purchase({
         clientId,
+        sessionId: sessionId || undefined,
         transactionId: event.data.object.id,
         value: totalAmount / 100, // cents to euros
         currency,

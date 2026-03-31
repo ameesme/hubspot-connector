@@ -6,6 +6,7 @@ const GA4_API_SECRET = process.env.GA4_API_SECRET || "x1tLj_WBSAWtThEdOg0r8Q";
 
 interface GA4PurchaseEvent {
   clientId: string;
+  sessionId?: string;
   transactionId: string;
   value: number;
   currency: string;
@@ -29,6 +30,7 @@ export async function sendGA4Purchase(data: GA4PurchaseEvent): Promise<void> {
 
   const payload = {
     client_id: data.clientId,
+    ...(data.sessionId && { session_id: data.sessionId }),
     events: [
       {
         name: "purchase",
