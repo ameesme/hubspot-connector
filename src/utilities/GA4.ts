@@ -30,11 +30,11 @@ export async function sendGA4Purchase(data: GA4PurchaseEvent): Promise<void> {
 
   const payload = {
     client_id: data.clientId,
-    ...(data.sessionId && { session_id: data.sessionId }),
     events: [
       {
         name: "purchase",
         params: {
+          ...(data.sessionId && { session_id: data.sessionId }),
           transaction_id: data.transactionId,
           value: data.value,
           tax: 0,
