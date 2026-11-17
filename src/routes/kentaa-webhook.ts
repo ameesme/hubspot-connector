@@ -21,6 +21,14 @@ async function handleKentaaWebhook(
     return;
   }
 
+  if (body.event_type !== "donations.update") {
+    console.log(
+      `[WEBHOOK] Ignoring event "${body.event_type}" for ${body.object_type} "${body.object_id}"`,
+    );
+    res.status(200).send();
+    return;
+  }
+
   console.log(
     `[WEBHOOK] Received donation update for donation "${body.object_id}"`,
   );
@@ -54,7 +62,7 @@ async function handleKentaaWebhook(
       `[KENTAA] Missing donation details for donation "${body.object_id}"`,
     );
 
-    res.status(400).send("Donation details are incomplete");
+    res.status(200).send("Skipped: donation details are incomplete");
     return;
   }
 

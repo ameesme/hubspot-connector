@@ -55,11 +55,7 @@ export interface KentaaWebhookData {
 }
 
 export function isKentaaWebhookValid(data: KentaaWebhookData): boolean {
-  if (!data || !data.event_type || !data.object_id) {
-    return false;
-  }
-
-  return data.event_type === "donations.update";
+  return !!data && !!data.event_type && !!data.object_id;
 }
 
 export function isKentaaDonationComplete(data: Donation): boolean {
